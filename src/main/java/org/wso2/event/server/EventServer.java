@@ -36,6 +36,7 @@ public class EventServer {
                     @Override
                     public void run() {
                         try {
+                            System.out.println("connection accepted from : "  + connectionSocket.getPort());
                             BufferedInputStream in = new BufferedInputStream(connectionSocket.getInputStream());
 
                             while (true) {

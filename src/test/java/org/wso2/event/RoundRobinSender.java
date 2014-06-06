@@ -13,6 +13,13 @@ public class RoundRobinSender {
 
     public static void main(String[] args) throws Exception {
 
+        String[] serverLocations = {"localhost:7615", "localhost:7616", "localhost:7617"}; //TODO give filtering server
+
+        if (args.length != 0 && args[0] != null) {
+            String receivers = args[0];
+            serverLocations = receivers.split("/");
+        }
+
         StreamDefinition streamDefinition = new StreamDefinition();
         streamDefinition.setStreamId("TestStream");
         streamDefinition.addAttribute("att1", StreamDefinition.Type.INT);
@@ -20,7 +27,7 @@ public class RoundRobinSender {
         streamDefinition.addAttribute("att3", StreamDefinition.Type.STRING);
         streamDefinition.addAttribute("att4", StreamDefinition.Type.INT);
 
-        String[] serverLocations = {"localhost:7615", "localhost:7616", "localhost:7617"}; //TODO give filtering server
+
 
         EventClient[] eventSenders = new EventClient[serverLocations.length];
 

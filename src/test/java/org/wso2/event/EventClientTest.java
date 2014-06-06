@@ -10,6 +10,10 @@ public class EventClientTest {
 
     public static void main(String[] args) throws Exception {
 
+        String receiver = "localhost:7613";
+        if (args.length != 0 && args[0] != null) {
+            receiver = args[0];
+        }
         StreamDefinition streamDefinition = new StreamDefinition();
         streamDefinition.setStreamId("TestStream");
         streamDefinition.addAttribute("att1", StreamDefinition.Type.INT);
@@ -17,14 +21,14 @@ public class EventClientTest {
         streamDefinition.addAttribute("att3", StreamDefinition.Type.STRING);
         streamDefinition.addAttribute("att4", StreamDefinition.Type.INT);
 
-        EventClient eventClient = new EventClient("localhost:7612", streamDefinition);
+        EventClient eventClient = new EventClient(receiver, streamDefinition);
 
 
         Thread.sleep(1000);
         System.out.println("Start testing");
         Random random = new Random();
 
-        for (int i = 0; i < 10000000; i++) {
+        for (int i = 0; i < 1000000000; i++) {
             eventClient.sendEvent(new Object[]{random.nextInt(), random.nextFloat(), "Abcdefghijklmnop" + random.nextLong(), random.nextInt()});
 
         }
