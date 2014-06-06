@@ -20,7 +20,7 @@ public class RoundRobinSender {
         streamDefinition.addAttribute("att3", StreamDefinition.Type.STRING);
         streamDefinition.addAttribute("att4", StreamDefinition.Type.INT);
 
-        String[] serverLocations = {}; //TODO give filtering server
+        String[] serverLocations = {"localhost:7615", "localhost:7616", "localhost:7617"}; //TODO give filtering server
 
         EventClient[] eventSenders = new EventClient[serverLocations.length];
 
@@ -39,7 +39,7 @@ public class RoundRobinSender {
         //round robin distribution
 
         int choice = 0;
-        for (int i = 0; i < 1000000; i++) {
+        for (int i = 0; i < 1000000000; i++) {
             choice = i%serverLocations.length;
             eventSenders[choice].sendEvent(new Object[]{random.nextInt(), random.nextFloat(), "Abcdefghijklmnop" + random.nextLong(), random.nextInt()});
 //            eventClient.sendEvent(new Object[]{random.nextInt(), random.nextFloat(), "Abcdefghijklmnop" + random.nextLong(), random.nextInt()});

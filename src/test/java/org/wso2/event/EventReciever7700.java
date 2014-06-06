@@ -5,7 +5,10 @@ import org.wso2.event.server.EventServerConfig;
 import org.wso2.event.server.StreamCallback;
 import org.wso2.event.server.StreamDefinition;
 
-public class EventReciever {
+/**
+ * Created by sameerak on 6/6/14.
+ */
+public class EventReciever7700 {
 
     private static volatile long count=0;
     private static volatile long start=System.currentTimeMillis();
@@ -19,11 +22,11 @@ public class EventReciever {
         streamDefinition.addAttribute("att3", StreamDefinition.Type.STRING);
         streamDefinition.addAttribute("att4", StreamDefinition.Type.INT);
 
-        EventServer eventServer = new EventServer(new EventServerConfig(7613), streamDefinition, new StreamCallback() {
+        EventServer eventServer = new EventServer(new EventServerConfig(7700), streamDefinition, new StreamCallback() {
             @Override
             public void receive(Object[] event) {
                 count++;
-                if(count%100000==0){
+                if(count%10000000==0){
                     long end=System.currentTimeMillis();
                     System.out.println("TP:"+(count*1000.0/(end-start)));
                     start=end;

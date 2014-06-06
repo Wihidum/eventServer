@@ -24,7 +24,7 @@ public class EventClientTest {
         System.out.println("Start testing");
         Random random = new Random();
 
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 10000000; i++) {
             eventClient.sendEvent(new Object[]{random.nextInt(), random.nextFloat(), "Abcdefghijklmnop" + random.nextLong(), random.nextInt()});
 
         }
