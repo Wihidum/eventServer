@@ -5,12 +5,14 @@ import org.wso2.event.server.EventServerConfig;
 import org.wso2.event.server.StreamCallback;
 import org.wso2.event.server.StreamDefinition;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 /**
  * Created by sameerak on 6/6/14.
  */
 public class EventReciever7700 {
 
-    private static volatile long count=0;
+    private static volatile AtomicLong count=new AtomicLong();
     private static volatile long start=System.currentTimeMillis();
 
     public static void main(String[] args) throws Exception {
@@ -25,10 +27,10 @@ public class EventReciever7700 {
         EventServer eventServer = new EventServer(new EventServerConfig(7700), streamDefinition, new StreamCallback() {
             @Override
             public void receive(Object[] event) {
-                count++;
-                if(count%10000000==0){
+              long value =  count.incrementAndGet();
+                if(value%10000000==0){
                     long end=System.currentTimeMillis();
-                    System.out.println("TP:"+(count*1000.0/(end-start)));
+                    System.out.println("TP:"+(10000000*1000.0/(end-start)));
                     start=end;
                 }
             }
