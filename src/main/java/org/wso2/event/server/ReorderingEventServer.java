@@ -40,40 +40,45 @@ public class ReorderingEventServer {
     public void start() throws Exception {
         System.out.println("Starting on " + eventServerConfig.getPort());
         ServerSocket welcomeSocket = new ServerSocket(eventServerConfig.getPort());
-        while (true) {
-            try {
-                Thread reorderThread = new Thread(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        try {
-                            while (true) {
-                                Thread.sleep(500);//per every 0.5 sec
-                                if (lastElementList.size() > 0) {
-                                    List<Long> tempList = new ArrayList<Long>(MAX_CONNECTIONS);
-                                    Iterator<Long> longIterator = lastElementList.iterator();
-                                    while (longIterator.hasNext()) {
-                                        tempList.add(longIterator.next());
-                                    }
-                                    Collections.sort(tempList);
-                                    long minimum = tempList.get(0);
-                                    for (Queue<Object[]> queue : reorderQueueList) {
-                                        while (true) {
-                                            if (queue.size() > 0 && (Long) (queue.peek()[0]) <= minimum) {
-                                                streamCallback.receive(queue.poll());
-                                            } else {
-                                                break;
-                                            }
+        Thread reorderThread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    while (true) {
+                        Thread.sleep(200);//per every 0.5 sec
+                        if (lastElementList.size() > 0) {
+                            List<Long> tempList = new ArrayList<Long>(MAX_CONNECTIONS);
+                            Iterator<Long> longIterator = lastElementList.iterator();
+                            while (longIterator.hasNext()) {
+                                tempList.add(longIterator.next());
+                            }
+                            Collections.sort(tempList);
+                            long minimum = tempList.get(0);
+                            for (Queue<Object[]> queue : reorderQueueList) {
+                                while (true) {
+                                    if (queue.size() > 0) {
+                                        if (((Long) (queue.peek()[0])) <= minimum) {
+                                            streamCallback.receive(queue.poll());
+                                        } else {
+                                            break;
                                         }
+                                    } else {
+                                        break;
                                     }
                                 }
                             }
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
                         }
                     }
-                });
-                reorderThread.start();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        reorderThread.start();
+        while (true) {
+            try {
                 final Socket connectionSocket = welcomeSocket.accept();
                 pool.submit(new Runnable() {
 
@@ -81,7 +86,8 @@ public class ReorderingEventServer {
                     public void run() {
                         try {
                             int position = getCount();
-                            System.out.println("position :" + position);
+                            lastElementList.add(new Long(0));
+                            System.out.println("position :" + position + " thread:" + Thread.currentThread().getId());
                             reorderQueueList.add(new LinkedBlockingQueue<Object[]>(AVG_EVENT_CAPACITY));
                             BufferedInputStream in = new BufferedInputStream(connectionSocket.getInputStream());
 
@@ -119,14 +125,8 @@ public class ReorderingEventServer {
                                             event[i] = new String(stringData, 0, stringData.length);
                                     }
                                 }
-                                try {
-                                    lastElementList.remove(position);
-                                } catch (Exception e) {
-                                    //do nothing
-                                }
-                                lastElementList.add(position, (Long) event[0]);
+                                updateLastElement(position, (Long) event[0]);
                                 reorderQueueList.get(position).offer(event);
-                                //streamCallback.receive(event);
                             }
                         } catch (IOException e) {
                             // TODO Auto-generated catch block
@@ -140,6 +140,11 @@ public class ReorderingEventServer {
             }
         }
 
+    }
+
+    private synchronized void updateLastElement(int position, Long timestamp) {
+        lastElementList.remove(position);
+        lastElementList.add(position, timestamp);
     }
 
     private synchronized int getCount() {
