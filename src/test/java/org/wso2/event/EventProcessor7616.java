@@ -7,12 +7,13 @@ import org.wso2.event.server.StreamDefinition;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.input.InputHandler;
-import org.wso2.siddhi.core.util.EventPrinter;
 
 import java.io.IOException;
-import java.util.Arrays;
 
-public class EventServerTest {
+/**
+ * Created by sameerak on 6/6/14.
+ */
+public class EventProcessor7616 {
     private static SiddhiManager siddhiManager;
     private static volatile long count=0;
 
@@ -24,7 +25,7 @@ public class EventServerTest {
         streamDefinition.addAttribute("att2", StreamDefinition.Type.FLOAT);
         streamDefinition.addAttribute("att3", StreamDefinition.Type.STRING);
         streamDefinition.addAttribute("att4", StreamDefinition.Type.INT);
-        final EventClient eventClient = new EventClient("localhost:7613", streamDefinition); //creating a connection to the output receiver
+        final EventClient eventClient = new EventClient("localhost:7700", streamDefinition); //creating a connection to the output receiver
 
         siddhiManager = new SiddhiManager();
         StringBuilder stringBuilder = new StringBuilder();
@@ -54,7 +55,7 @@ public class EventServerTest {
             }
         });
 
-        EventServer eventServer = new EventServer(new EventServerConfig(7612), streamDefinition, new org.wso2.event.server.StreamCallback() {
+        EventServer eventServer = new EventServer(new EventServerConfig(7616), streamDefinition, new org.wso2.event.server.StreamCallback() {
             @Override
             public void receive(Object[] event) {
 //                System.out.println("test");
@@ -66,8 +67,8 @@ public class EventServerTest {
                         e.printStackTrace();
                     }
                 }else{
-                System.out.println("Could not retrieve stream handler");
-                throw new RuntimeException("Could not retrieve stream handler");
+                    System.out.println("Could not retrieve stream handler");
+                    throw new RuntimeException("Could not retrieve stream handler");
                 }
 
             }

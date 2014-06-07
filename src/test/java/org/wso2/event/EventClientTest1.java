@@ -5,17 +5,20 @@ import org.wso2.event.server.StreamDefinition;
 
 import java.util.Random;
 
-public class EventClientTest {
+/**
+ * Created by sameerak on 6/7/14.
+ */
+public class EventClientTest1 {
 
 
     public static void main(String[] args) throws Exception {
 
-        String receiver = "localhost:7613";
+        String receiver = "localhost:7614";
         if (args.length != 0 && args[0] != null) {
             receiver = args[0];
         }
         StreamDefinition streamDefinition = new StreamDefinition();
-        streamDefinition.setStreamId("TestStream");
+        streamDefinition.setStreamId("TestStream1");
         streamDefinition.addAttribute("att1", StreamDefinition.Type.INT);
         streamDefinition.addAttribute("att2", StreamDefinition.Type.FLOAT);
         streamDefinition.addAttribute("att3", StreamDefinition.Type.STRING);

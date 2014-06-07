@@ -5,6 +5,7 @@
 .gwt
 .gwt-tmp
 target
+temp
 .classpath
 .externalToolBuilders
 .project

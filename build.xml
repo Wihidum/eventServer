@@ -1,0 +1,122 @@
+<!--
+  ~  Licensed to the Apache Software Foundation (ASF) under one
+  ~  or more contributor license agreements.  See the NOTICE file
+  ~  distributed with this work for additional information
+  ~  regarding copyright ownership.  The ASF licenses this file
+  ~  to you under the Apache License, Version 2.0 (the
+  ~  "License"); you may not use this file except in compliance
+  ~  with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an
+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~  KIND, either express or implied.  See the License for the
+  ~  specific language governing permissions and limitations
+  ~  under the License.
+  -->
+
+<project default="init">
+
+    <property name="src.dir" value="src"/>
+    <property name="temp.dir" value="temp"/>
+    <property name="class.dir" value="${temp.dir}/classes"/>
+
+
+    
+    <property name="host" value="localhost"/>
+    <property name="port" value="7611"/>
+    <property name="events" value="20"/>
+
+    <path id="javac.classpath">
+        <pathelement path="${class.dir}"/>
+        <fileset dir=".">
+            <include name="lib/*.jar"/>
+        </fileset>
+    </path>
+
+
+    
+
+    <target name="init">
+        <mkdir dir="${temp.dir}"/>
+        <mkdir dir="${class.dir}"/>
+    </target>
+
+    <!--compile-->
+    
+
+    <target name="compile-agent" depends="init">
+        <javac srcdir="${src.dir}" destdir="${class.dir}">
+            <include name="main/java/org/wso2/event/client/**"/>
+			<include name="main/java/org/wso2/event/server/**"/>
+            <include name="test/java/org/wso2/event/**"/>
+
+            <classpath refid="javac.classpath"/>
+        </javac>
+    </target>
+    
+
+    <!--undeploy-->
+   
+
+    <!--deploy-->
+    
+
+ 
+
+    <target name="eventReciever" depends="compile-agent">
+        <echo>To configure port use -Dport=xxxx, default 7613
+        </echo>
+        <java classname="org.wso2.event.EventReciever"
+              classpathref="javac.classpath" fork="true">
+            <arg value="${port}"/>
+        </java>
+    </target>
+	<target name="eventProcessor" depends="compile-agent">
+        <echo>To configure port and receiver use -Dport=xxxx -Drcv=xx, default port = 7613 receiver = "localhost:7613"
+        </echo>
+        <java classname="org.wso2.event.EventProcessor"
+              classpathref="javac.classpath" fork="true">
+            <arg value="${port}"/>
+            <arg value="${rcv}"/>
+        </java>
+    </target>
+	<target name="eventFilerProcessor" depends="compile-agent">
+        <echo>To configure port and receiver use -Dport=xxxx -Drcv=xx, default port = 7613 receiver = "localhost:7613"
+        </echo>
+        <java classname="org.wso2.event.EventFilterProcessor"
+              classpathref="javac.classpath" fork="true">
+            <arg value="${port}"/>
+            <arg value="${rcv}"/>
+        </java>
+    </target>
+    <target name="roundRobinSender" depends="compile-agent">
+        <echo>To configure port use -Drcvs=xxxx, default localhost:7615/localhost:7616/localhost:7617"
+        </echo>
+        <java classname="org.wso2.event.RoundRobinSender"
+              classpathref="javac.classpath" fork="true">
+            <arg value="${rcvs}"/>
+        </java>
+    </target>
+	<target name="eventClientTest" depends="compile-agent">
+        <echo>To configure port and receiver use -Drcv=xx, default receiver = "localhost:7613"
+        </echo>
+        <java classname="org.wso2.event.EventClientTest"
+              classpathref="javac.classpath" fork="true">
+            <arg value="${rcv}"/>
+        </java>
+    </target>
+    <target name="agentPhoneRetailClient" depends="compile-agent">
+        <echo>To configure host, port and No. of events use -Dhost=xxxx -Dport=xxxx -Devents=xx
+        </echo>
+        <java classname="org.wso2.carbon.cep.sample.agent.PhoneRetailAgent"
+              classpathref="javac.classpath" fork="true">
+            <arg value="${host}"/>
+            <arg value="${port}"/>
+            <arg value="${events}"/>
+        </java>
+    </target>
+
+</project>

@@ -7,16 +7,26 @@ import org.wso2.event.server.StreamDefinition;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.stream.input.InputHandler;
-import org.wso2.siddhi.core.util.EventPrinter;
 
 import java.io.IOException;
-import java.util.Arrays;
 
-public class EventServerTest {
+/**
+ * Created by sameerak on 6/7/14.
+ */
+public class EventJoinProcessor {
     private static SiddhiManager siddhiManager;
     private static volatile long count=0;
 
     public static void main(String[] args) throws Exception {
+
+        int port = 7614;
+        String receiver = "localhost:7613";
+        if (args.length != 0 && args[0] != null) {
+            port = Integer.parseInt(args[0]);
+        }
+        if (args.length != 0 && args[1] != null) {
+            receiver = args[1];
+        }
 
         StreamDefinition streamDefinition = new StreamDefinition();
         streamDefinition.setStreamId("TestStream");
@@ -24,19 +34,36 @@ public class EventServerTest {
         streamDefinition.addAttribute("att2", StreamDefinition.Type.FLOAT);
         streamDefinition.addAttribute("att3", StreamDefinition.Type.STRING);
         streamDefinition.addAttribute("att4", StreamDefinition.Type.INT);
-        final EventClient eventClient = new EventClient("localhost:7613", streamDefinition); //creating a connection to the output receiver
+
+        StreamDefinition streamDefinition1 = new StreamDefinition();
+        streamDefinition1.setStreamId("TestStream1");
+        streamDefinition1.addAttribute("att1", StreamDefinition.Type.INT);
+        streamDefinition1.addAttribute("att2", StreamDefinition.Type.FLOAT);
+        streamDefinition1.addAttribute("att3", StreamDefinition.Type.STRING);
+        streamDefinition1.addAttribute("att4", StreamDefinition.Type.INT);
+
+        final EventClient eventClient = new EventClient(receiver, streamDefinition); //creating a connection to the output receiver
 
         siddhiManager = new SiddhiManager();
         StringBuilder stringBuilder = new StringBuilder();
+
         String attributeStr = streamDefinition.getAttributeList().get(0).getName()+" "+streamDefinition.getAttributeList().get(0).getType().toString().toLowerCase();
         for(int i=1; i<streamDefinition.getAttributeList().size();i++){
             attributeStr += "," + streamDefinition.getAttributeList().get(i).getName() + " " + streamDefinition.getAttributeList().get(i).getType().toString().toLowerCase();
         }
 
+        String attributeStr1 = streamDefinition1.getAttributeList().get(0).getName()+" "+streamDefinition1.getAttributeList().get(0).getType().toString().toLowerCase();
+        for(int i=1; i<streamDefinition1.getAttributeList().size();i++){
+            attributeStr1 += "," + streamDefinition1.getAttributeList().get(i).getName() + " " + streamDefinition1.getAttributeList().get(i).getType().toString().toLowerCase();
+        }
+
         siddhiManager.defineStream("define stream "+streamDefinition.getStreamId()+" ( "+attributeStr+" )");
-        siddhiManager.addQuery("from  TestStream [att1>50]" +
-                "select att1, att2, att3, att4 "+
-                "insert into StockQuote ;");
+        siddhiManager.defineStream("define stream "+streamDefinition1.getStreamId()+" ( "+attributeStr1+" )");
+
+        siddhiManager.addQuery("from TestStream#window.length(2000) join " +
+                "TestStream1#window.time(500) " +
+                "select * " +
+                "insert into StockQuote;");
         siddhiManager.addCallback("StockQuote", new org.wso2.siddhi.core.stream.output.StreamCallback() {
             @Override
             public void receive(Event[] events) {
@@ -54,7 +81,7 @@ public class EventServerTest {
             }
         });
 
-        EventServer eventServer = new EventServer(new EventServerConfig(7612), streamDefinition, new org.wso2.event.server.StreamCallback() {
+        EventServer eventServer = new EventServer(new EventServerConfig(port), streamDefinition, new org.wso2.event.server.StreamCallback() {
             @Override
             public void receive(Object[] event) {
 //                System.out.println("test");
@@ -66,8 +93,8 @@ public class EventServerTest {
                         e.printStackTrace();
                     }
                 }else{
-                System.out.println("Could not retrieve stream handler");
-                throw new RuntimeException("Could not retrieve stream handler");
+                    System.out.println("Could not retrieve stream handler");
+                    throw new RuntimeException("Could not retrieve stream handler");
                 }
 
             }

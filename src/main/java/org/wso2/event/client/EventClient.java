@@ -55,7 +55,7 @@ public class EventClient {
         for (int i = 0, typesLength = types.length; i < typesLength; i++) {
             StreamDefinition.Type type = types[i];
             switch (type) {
-                case INTEGER:
+                case INT:
                     buf.putInt((Integer) event[i]);
                     continue;
                 case LONG:
