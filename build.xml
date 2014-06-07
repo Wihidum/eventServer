@@ -74,7 +74,16 @@
             <arg value="${port}"/>
         </java>
     </target>
-	<target name="eventProcessor" depends="compile-agent">
+
+    <target name="reorderEventReciever" depends="compile-agent">
+        <echo>To configure port use -Dport=xxxx, default 7700
+        </echo>
+        <java classname="org.wso2.event.EventReciever"
+              classpathref="javac.classpath" fork="true">
+            <arg value="${port}"/>
+        </java>
+    </target>
+    <target name="eventProcessor" depends="compile-agent">
         <echo>To configure port and receiver use -Dport=xxxx -Drcv=xx, default port = 7613 receiver = "localhost:7613"
         </echo>
         <java classname="org.wso2.event.EventProcessor"
