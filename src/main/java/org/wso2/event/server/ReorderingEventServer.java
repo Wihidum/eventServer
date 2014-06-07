@@ -60,7 +60,6 @@ public class ReorderingEventServer {
                                     for (Queue<Object[]> queue : reorderQueueList) {
                                         while (true) {
                                             if (queue.size() > 0 && (Long) (queue.peek()[0]) <= minimum) {
-                                                System.out.println(queue.peek()[0]);
                                                 streamCallback.receive(queue.poll());
                                             } else {
                                                 break;
